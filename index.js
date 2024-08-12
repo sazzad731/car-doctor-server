@@ -23,7 +23,7 @@ function verifyJWT(req, res, next) {
   }
   const token = authHeader.split(" ")[1];
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
-    if (err) {
+    if (err) {price:
       return res.status(401).send({ message: "unauthorized access" });
     }
     req.decoded = decoded;
@@ -65,7 +65,10 @@ async function run() {
 
     // Services api
     app.get("/services", async (req, res) => {
-      const cursor = serviceCollection.find();
+      const search = req.query.search;
+      const query = { title: { $regex: search, $options: 'i' } };
+      const order = req.query.order === 'asc' ? 1 : -1;
+      const cursor = serviceCollection.find(query).sort({ price: order });
       const result = await cursor.toArray();
       res.send(result);
     });
